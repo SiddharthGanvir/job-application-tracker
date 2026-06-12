@@ -1,3 +1,4 @@
+import jwt from "jsonwebtoken";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 
@@ -42,6 +43,58 @@ export const register = async (
         name: user.name,
         email: user.email,
       },
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      message: "Server Error",
+    });
+  }
+};
+export const login = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        message: "Invalid credentials",
+      });
+    }
+
+    const isPasswordValid = await bcrypt.compare(
+      password,
+      user.password
+    );
+
+    if (!isPasswordValid) {
+      return res.status(400).json({
+        message: "Invalid credentials",
+      });
+    }
+
+    const token = jwt.sign(
+      {
+        userId: user.id,
+      },
+      process.env.JWT_SECRET as string,
+      {
+        expiresIn: "7d",
+      }
+    );
+
+    return res.status(200).json({
+      message: "Login successful",
+      token,
     });
   } catch (error) {
     console.error(error);
