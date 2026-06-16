@@ -1,7 +1,10 @@
 import express from "express";
 
-import { createApplication }
-from "../controllers/applicationController";
+import {
+  createApplication,
+  getApplications,
+  updateApplication,
+} from "../controllers/applicationController";
 
 import {
   authenticateToken,
@@ -13,6 +16,18 @@ router.post(
   "/",
   authenticateToken,
   createApplication
+);
+
+router.get(
+  "/",
+  authenticateToken,
+  getApplications
+);
+
+router.put(
+  "/:id",
+  authenticateToken,
+  updateApplication
 );
 
 export default router;
