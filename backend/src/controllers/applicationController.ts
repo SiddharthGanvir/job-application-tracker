@@ -116,3 +116,47 @@ export const updateApplication = async (
     });
   }
 };
+
+export const deleteApplication = async (
+  req: AuthRequest,
+  res: Response
+) => {
+  try {
+    const applicationId = Number(req.params.id);
+
+    const application =
+      await prisma.jobApplication.findUnique({
+        where: {
+          id: applicationId,
+        },
+      });
+
+    if (!application) {
+      return res.status(404).json({
+        message: "Application not found",
+      });
+    }
+
+    if (application.userId !== req.userId) {
+      return res.status(403).json({
+        message: "Unauthorized",
+      });
+    }
+
+    await prisma.jobApplication.delete({
+      where: {
+        id: applicationId,
+      },
+    });
+
+    return res.status(200).json({
+      message: "Application deleted successfully",
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      message: "Server Error",
+    });
+  }
+};

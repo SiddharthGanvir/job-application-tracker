@@ -4,6 +4,7 @@ import {
   createApplication,
   getApplications,
   updateApplication,
+  deleteApplication,
 } from "../controllers/applicationController";
 
 import {
@@ -28,6 +29,12 @@ router.put(
   "/:id",
   authenticateToken,
   updateApplication
+);
+
+router.delete(
+  "/:id",
+  authenticateToken,
+  deleteApplication
 );
 
 export default router;
