@@ -1,9 +1,7 @@
 import express from "express";
-import {
-  register,
-  login,
-  profile,
-} from "../controllers/authController";
+
+import { createApplication }
+from "../controllers/applicationController";
 
 import {
   authenticateToken,
@@ -11,12 +9,10 @@ import {
 
 const router = express.Router();
 
-router.post("/register", register);
-router.post("/login", login);
-router.get(
-  "/profile",
+router.post(
+  "/",
   authenticateToken,
-  profile
+  createApplication
 );
 
 export default router;

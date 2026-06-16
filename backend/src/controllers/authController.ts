@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 
 import prisma from "../config/prisma";
+import { AuthRequest } from "../middleware/authMiddleware";
 
 export const register = async (
   req: Request,
@@ -103,4 +104,13 @@ export const login = async (
       message: "Server Error",
     });
   }
+};
+
+export const profile = async (
+  req: AuthRequest,
+  res: Response
+) => {
+  return res.status(200).json({
+    userId: req.userId,
+  });
 };
