@@ -15,6 +15,33 @@ function Dashboard() {
   const [status, setStatus] =
     useState("Applied");
 
+  const totalApplications =
+    applications.length;
+
+  const appliedCount =
+    applications.filter(
+      (app) =>
+        app.status === "Applied"
+    ).length;
+
+  const interviewCount =
+    applications.filter(
+      (app) =>
+        app.status === "Interview"
+    ).length;
+
+  const offerCount =
+    applications.filter(
+      (app) =>
+        app.status === "Offer"
+    ).length;
+
+  const rejectedCount =
+    applications.filter(
+      (app) =>
+        app.status === "Rejected"
+    ).length;
+
   const fetchApplications =
     async () => {
       try {
@@ -86,6 +113,16 @@ function Dashboard() {
     };
 
   useEffect(() => {
+    const token =
+      localStorage.getItem(
+        "token"
+      );
+
+    if (!token) {
+      window.location.href = "/";
+      return;
+    }
+
     fetchApplications();
   }, []);
 
@@ -95,7 +132,66 @@ function Dashboard() {
         padding: "40px",
       }}
     >
-      <h1>Dashboard</h1>
+      <div
+        style={{
+          display: "flex",
+          justifyContent:
+            "space-between",
+          alignItems: "center",
+        }}
+      >
+        <h1>Dashboard</h1>
+
+        <button
+          onClick={() => {
+            localStorage.removeItem(
+              "token"
+            );
+
+            window.location.href =
+              "/";
+          }}
+        >
+          Logout
+        </button>
+      </div>
+
+      <div
+        style={{
+          marginTop: "20px",
+          marginBottom: "30px",
+          border:
+            "1px solid black",
+          padding: "15px",
+        }}
+      >
+        <h2>Statistics</h2>
+
+        <p>
+          Total Applications:
+          {totalApplications}
+        </p>
+
+        <p>
+          Applied:
+          {appliedCount}
+        </p>
+
+        <p>
+          Interview:
+          {interviewCount}
+        </p>
+
+        <p>
+          Offer:
+          {offerCount}
+        </p>
+
+        <p>
+          Rejected:
+          {rejectedCount}
+        </p>
+      </div>
 
       <div
         style={{
@@ -109,7 +205,9 @@ function Dashboard() {
           placeholder="Company Name"
           value={companyName}
           onChange={(e) =>
-            setCompanyName(e.target.value)
+            setCompanyName(
+              e.target.value
+            )
           }
         />
 
@@ -121,7 +219,9 @@ function Dashboard() {
           placeholder="Role"
           value={role}
           onChange={(e) =>
-            setRole(e.target.value)
+            setRole(
+              e.target.value
+            )
           }
         />
 
@@ -131,7 +231,9 @@ function Dashboard() {
         <select
           value={status}
           onChange={(e) =>
-            setStatus(e.target.value)
+            setStatus(
+              e.target.value
+            )
           }
         >
           <option>Applied</option>
@@ -144,7 +246,9 @@ function Dashboard() {
         <br />
 
         <button
-          onClick={createApplication}
+          onClick={
+            createApplication
+          }
         >
           Create Application
         </button>
