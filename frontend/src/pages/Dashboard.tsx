@@ -155,22 +155,15 @@ function Dashboard() {
   }, []);
 
   return (
-    <div
-      style={{
-        padding: "40px",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          justifyContent:
-            "space-between",
-          alignItems: "center",
-        }}
-      >
-        <h1>Dashboard</h1>
+    
+    <div className="min-h-screen bg-gray-100 p-10">
+    <div className="flex justify-between items-center mb-8">
+        <h1 className="text-4xl font-bold">
+  Dashboard
+</h1>
 
         <button
+          className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
           onClick={() => {
             localStorage.removeItem(
               "token"
@@ -193,75 +186,40 @@ function Dashboard() {
           marginBottom: "30px",
         }}
       >
-        <div
-          style={{
-            border:
-              "1px solid black",
-            padding: "15px",
-            minWidth: "150px",
-            textAlign: "center",
-          }}
-        >
+        <div className ="bg-white shadow-md rounded-lg p-6 min-w-[150px] text-center">
+        
           <h3>Total</h3>
           <h2>
             {totalApplications}
           </h2>
         </div>
 
-        <div
-          style={{
-            border:
-              "1px solid black",
-            padding: "15px",
-            minWidth: "150px",
-            textAlign: "center",
-          }}
-        >
+        <div className ="bg-white shadow-md rounded-lg p-6 min-w-[150px] text-center">
+          
           <h3>Applied</h3>
           <h2>
             {appliedCount}
           </h2>
         </div>
 
-        <div
-          style={{
-            border:
-              "1px solid black",
-            padding: "15px",
-            minWidth: "150px",
-            textAlign: "center",
-          }}
-        >
+        <div className ="bg-white shadow-md rounded-lg p-6 min-w-[150px] text-center">
+
           <h3>Interview</h3>
           <h2>
             {interviewCount}
           </h2>
         </div>
 
-        <div
-          style={{
-            border:
-              "1px solid black",
-            padding: "15px",
-            minWidth: "150px",
-            textAlign: "center",
-          }}
-        >
+        <div className ="bg-white shadow-md rounded-lg p-6 min-w-[150px] text-center">
+
           <h3>Offer</h3>
           <h2>
             {offerCount}
           </h2>
         </div>
 
-        <div
-          style={{
-            border:
-              "1px solid black",
-            padding: "15px",
-            minWidth: "150px",
-            textAlign: "center",
-          }}
-        >
+         <div className ="bg-white shadow-md rounded-lg p-6 min-w-[150px] text-center">
+
           <h3>Rejected</h3>
           <h2>
             {rejectedCount}
@@ -269,18 +227,16 @@ function Dashboard() {
         </div>
       </div>
 
-      <div
-        style={{
-          marginBottom: "30px",
-        }}
-      >
-        <h2>
+      <div className = "bg-white p-6 rounded-lg shadow-md mb-8">
+        
+        <h2 className="text-2xl font-bold mb-4">
           Create Application
         </h2>
 
         <input
           type="text"
           placeholder="Company Name"
+          className="border rounded-lg px-4 py-2 w-64 mb-4"
           value={companyName}
           onChange={(e) =>
             setCompanyName(
@@ -295,6 +251,7 @@ function Dashboard() {
         <input
           type="text"
           placeholder="Role"
+          className="border rounded-lg px-4 py-2 w-64 mb-4"
           value={role}
           onChange={(e) =>
             setRole(
@@ -307,6 +264,7 @@ function Dashboard() {
         <br />
 
         <select
+          className="border rounded-lg px-4 py-2 mb-4"
           value={status}
           onChange={(e) =>
             setStatus(
@@ -332,6 +290,7 @@ function Dashboard() {
         <br />
 
         <button
+          className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
           onClick={
             createApplication
           }
@@ -340,11 +299,12 @@ function Dashboard() {
         </button>
       </div>
 
-      <h2>Applications</h2>
-
+      <h2 className ="text-2xl font-bold mb-4">Applications</h2>
+      <div className="flex gap-4 mb-6">
       <input
         type="text"
         placeholder="Search Company"
+        className ="border rounded-lg px-4 py-2 w-64"
         value={searchTerm}
         onChange={(e) =>
           setSearchTerm(
@@ -353,24 +313,8 @@ function Dashboard() {
         }
       />
 
-      <br />
-      <br />
-
-      <input
-  type="text"
-  placeholder="Search Company"
-  value={searchTerm}
-  onChange={(e) =>
-    setSearchTerm(
-      e.target.value
-    )
-  }
-/>
-
-<br />
-<br />
-
 <select
+  className="border rounded-lg px-4 py-2"
   value={filterStatus}
   onChange={(e) =>
     setFilterStatus(
@@ -384,9 +328,9 @@ function Dashboard() {
   <option>Offer</option>
   <option>Rejected</option>
 </select>
+</div>
 
-<br />
-<br />
+
 
       {filteredApplications.map(
         (application) => (
