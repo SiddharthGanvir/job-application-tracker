@@ -15,6 +15,12 @@ function Dashboard() {
   const [status, setStatus] =
     useState("Applied");
 
+  const [searchTerm, setSearchTerm] =
+    useState("");
+
+  const [filterStatus, setFilterStatus] =
+  useState("All");
+
   const totalApplications =
     applications.length;
 
@@ -41,6 +47,28 @@ function Dashboard() {
       (app) =>
         app.status === "Rejected"
     ).length;
+
+  const filteredApplications =
+  applications.filter(
+    (application) => {
+      const matchesSearch =
+        application.companyName
+          .toLowerCase()
+          .includes(
+            searchTerm.toLowerCase()
+          );
+
+      const matchesStatus =
+        filterStatus === "All" ||
+        application.status ===
+          filterStatus;
+
+      return (
+        matchesSearch &&
+        matchesStatus
+      );
+    }
+  );
 
   const fetchApplications =
     async () => {
@@ -158,39 +186,87 @@ function Dashboard() {
 
       <div
         style={{
+          display: "flex",
+          gap: "15px",
+          flexWrap: "wrap",
           marginTop: "20px",
           marginBottom: "30px",
-          border:
-            "1px solid black",
-          padding: "15px",
         }}
       >
-        <h2>Statistics</h2>
+        <div
+          style={{
+            border:
+              "1px solid black",
+            padding: "15px",
+            minWidth: "150px",
+            textAlign: "center",
+          }}
+        >
+          <h3>Total</h3>
+          <h2>
+            {totalApplications}
+          </h2>
+        </div>
 
-        <p>
-          Total Applications:
-          {totalApplications}
-        </p>
+        <div
+          style={{
+            border:
+              "1px solid black",
+            padding: "15px",
+            minWidth: "150px",
+            textAlign: "center",
+          }}
+        >
+          <h3>Applied</h3>
+          <h2>
+            {appliedCount}
+          </h2>
+        </div>
 
-        <p>
-          Applied:
-          {appliedCount}
-        </p>
+        <div
+          style={{
+            border:
+              "1px solid black",
+            padding: "15px",
+            minWidth: "150px",
+            textAlign: "center",
+          }}
+        >
+          <h3>Interview</h3>
+          <h2>
+            {interviewCount}
+          </h2>
+        </div>
 
-        <p>
-          Interview:
-          {interviewCount}
-        </p>
+        <div
+          style={{
+            border:
+              "1px solid black",
+            padding: "15px",
+            minWidth: "150px",
+            textAlign: "center",
+          }}
+        >
+          <h3>Offer</h3>
+          <h2>
+            {offerCount}
+          </h2>
+        </div>
 
-        <p>
-          Offer:
-          {offerCount}
-        </p>
-
-        <p>
-          Rejected:
-          {rejectedCount}
-        </p>
+        <div
+          style={{
+            border:
+              "1px solid black",
+            padding: "15px",
+            minWidth: "150px",
+            textAlign: "center",
+          }}
+        >
+          <h3>Rejected</h3>
+          <h2>
+            {rejectedCount}
+          </h2>
+        </div>
       </div>
 
       <div
@@ -198,7 +274,9 @@ function Dashboard() {
           marginBottom: "30px",
         }}
       >
-        <h2>Create Application</h2>
+        <h2>
+          Create Application
+        </h2>
 
         <input
           type="text"
@@ -236,10 +314,18 @@ function Dashboard() {
             )
           }
         >
-          <option>Applied</option>
-          <option>Interview</option>
-          <option>Offer</option>
-          <option>Rejected</option>
+          <option>
+            Applied
+          </option>
+          <option>
+            Interview
+          </option>
+          <option>
+            Offer
+          </option>
+          <option>
+            Rejected
+          </option>
         </select>
 
         <br />
@@ -256,7 +342,53 @@ function Dashboard() {
 
       <h2>Applications</h2>
 
-      {applications.map(
+      <input
+        type="text"
+        placeholder="Search Company"
+        value={searchTerm}
+        onChange={(e) =>
+          setSearchTerm(
+            e.target.value
+          )
+        }
+      />
+
+      <br />
+      <br />
+
+      <input
+  type="text"
+  placeholder="Search Company"
+  value={searchTerm}
+  onChange={(e) =>
+    setSearchTerm(
+      e.target.value
+    )
+  }
+/>
+
+<br />
+<br />
+
+<select
+  value={filterStatus}
+  onChange={(e) =>
+    setFilterStatus(
+      e.target.value
+    )
+  }
+>
+  <option>All</option>
+  <option>Applied</option>
+  <option>Interview</option>
+  <option>Offer</option>
+  <option>Rejected</option>
+</select>
+
+<br />
+<br />
+
+      {filteredApplications.map(
         (application) => (
           <div
             key={application.id}
