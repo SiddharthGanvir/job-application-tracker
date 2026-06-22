@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import api from "../services/api";
 
@@ -38,47 +38,57 @@ function Login() {
     }
   };
 
-  return (
-    <div
-      style={{
-        padding: "40px",
-      }}
-    >
-      <h1>Login</h1>
+ return (
+  <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="bg-white p-8 rounded-lg shadow-md w-96">
+      <h1 className="text-3xl font-bold mb-6 text-center">
+        Login
+      </h1>
 
-      <form onSubmit={handleLogin}>
-        <div>
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) =>
-              setEmail(e.target.value)
-            }
-          />
-        </div>
+      <form
+        onSubmit={handleLogin}
+        className="space-y-4"
+      >
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) =>
+            setEmail(e.target.value)
+          }
+          className="w-full border rounded-lg px-4 py-2"
+        />
 
-        <br />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) =>
+            setPassword(e.target.value)
+          }
+          className="w-full border rounded-lg px-4 py-2"
+        />
 
-        <div>
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) =>
-              setPassword(e.target.value)
-            }
-          />
-        </div>
-
-        <br />
-
-        <button type="submit">
+        <button
+          type="submit"
+          className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600"
+        >
           Login
         </button>
+
+        <p className="text-center mt-4">
+          Don't have an account?{" "}
+          <Link
+            to="/register"
+            className="text-blue-500 hover:underline"
+          >
+            Register
+          </Link>
+        </p>
       </form>
     </div>
-  );
+  </div>
+);
 }
 
 export default Login;

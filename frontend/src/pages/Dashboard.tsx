@@ -233,70 +233,47 @@ function Dashboard() {
           Create Application
         </h2>
 
-        <input
-          type="text"
-          placeholder="Company Name"
-          className="border rounded-lg px-4 py-2 w-64 mb-4"
-          value={companyName}
-          onChange={(e) =>
-            setCompanyName(
-              e.target.value
-            )
-          }
-        />
+        <div className="flex flex-wrap gap-4 items-center">
+  <input
+    type="text"
+    placeholder="Company Name"
+    className="border rounded-lg px-4 py-2 w-64"
+    value={companyName}
+    onChange={(e) =>
+      setCompanyName(e.target.value)
+    }
+  />
 
-        <br />
-        <br />
+  <input
+    type="text"
+    placeholder="Role"
+    className="border rounded-lg px-4 py-2 w-64"
+    value={role}
+    onChange={(e) =>
+      setRole(e.target.value)
+    }
+  />
 
-        <input
-          type="text"
-          placeholder="Role"
-          className="border rounded-lg px-4 py-2 w-64 mb-4"
-          value={role}
-          onChange={(e) =>
-            setRole(
-              e.target.value
-            )
-          }
-        />
+  <select
+    className="border rounded-lg px-4 py-2"
+    value={status}
+    onChange={(e) =>
+      setStatus(e.target.value)
+    }
+  >
+    <option>Applied</option>
+    <option>Interview</option>
+    <option>Offer</option>
+    <option>Rejected</option>
+  </select>
 
-        <br />
-        <br />
-
-        <select
-          className="border rounded-lg px-4 py-2 mb-4"
-          value={status}
-          onChange={(e) =>
-            setStatus(
-              e.target.value
-            )
-          }
-        >
-          <option>
-            Applied
-          </option>
-          <option>
-            Interview
-          </option>
-          <option>
-            Offer
-          </option>
-          <option>
-            Rejected
-          </option>
-        </select>
-
-        <br />
-        <br />
-
-        <button
-          className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
-          onClick={
-            createApplication
-          }
-        >
-          Create Application
-        </button>
+  <button
+    className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+    onClick={createApplication}
+  >
+    Create Application
+  </button>
+</div>
       </div>
 
       <h2 className ="text-2xl font-bold mb-4">Applications</h2>
@@ -334,74 +311,56 @@ function Dashboard() {
 
       {filteredApplications.map(
         (application) => (
+
           <div
             key={application.id}
-            style={{
-              border:
-                "1px solid black",
-              padding: "10px",
-              marginBottom:
-                "10px",
-            }}
+            className="bg-white shadow-md rounded-lg p-5 mb-4"
           >
-            <h3>
+            <h3 className="text-xl font-bold">
               {
                 application.companyName
               }
             </h3>
 
-            <p>
-              Role:
+            <p className="text-gray-600 mb-4">
               {
                 application.role
               }
             </p>
+          <div className="flex items-center justify-between mt-4">
+  <div>
+    <label className="mr-2">
+      Status:
+    </label>
 
-            <div>
-              <label>
-                Status:
-              </label>
+    <select
+      className="border rounded-lg px-3 py-1"
+      value={application.status}
+      onChange={(e) =>
+        updateApplicationStatus(
+          application.id,
+          e.target.value
+        )
+      }
+    >
+      <option>Applied</option>
+      <option>Interview</option>
+      <option>Offer</option>
+      <option>Rejected</option>
+    </select>
+  </div>
 
-              <select
-                value={
-                  application.status
-                }
-                onChange={(e) =>
-                  updateApplicationStatus(
-                    application.id,
-                    e.target.value
-                  )
-                }
-              >
-                <option>
-                  Applied
-                </option>
-
-                <option>
-                  Interview
-                </option>
-
-                <option>
-                  Offer
-                </option>
-
-                <option>
-                  Rejected
-                </option>
-              </select>
-            </div>
-
-            <br />
-
-            <button
-              onClick={() =>
-                deleteApplication(
-                  application.id
-                )
-              }
-            >
-              Delete
-            </button>
+  <button
+    className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600"
+    onClick={() =>
+      deleteApplication(
+        application.id
+      )
+    }
+  >
+    Delete
+  </button>
+</div>    
           </div>
         )
       )}
