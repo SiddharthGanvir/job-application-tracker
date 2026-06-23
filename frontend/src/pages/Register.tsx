@@ -25,6 +25,40 @@ function Register() {
       e.preventDefault();
 
       try {
+        if (
+  !name.trim() ||
+  !email.trim() ||
+  !password.trim()
+) {
+  alert(
+    "All fields are required"
+  );
+
+  return;
+}
+
+const emailRegex =
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+if (
+  !emailRegex.test(email)
+) {
+  alert(
+    "Please enter a valid email address"
+  );
+
+  return;
+}
+
+if (
+  password.length < 8
+) {
+  alert(
+    "Password must be at least 8 characters"
+  );
+
+  return;
+}
         await api.post(
           "/auth/register",
           {
@@ -35,7 +69,7 @@ function Register() {
         );
 
         alert(
-          "Registration successful"
+          "Verification email sent successfully. Please verify your email before logging in."
         );
 
         navigate("/");

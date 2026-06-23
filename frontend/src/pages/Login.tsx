@@ -13,6 +13,30 @@ function Login() {
     e: React.FormEvent
   ) => {
     e.preventDefault();
+    
+    if (
+  !email.trim() ||
+  !password.trim()
+) {
+  alert(
+    "Email and Password are required"
+  );
+
+  return;
+}
+
+const emailRegex =
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+if (
+  !emailRegex.test(email)
+) {
+  alert(
+    "Please enter a valid email address"
+  );
+
+  return;
+}
 
     try {
       const response = await api.post(
@@ -31,11 +55,14 @@ function Login() {
       );
 
       navigate("/dashboard");
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+  console.error(error);
 
-      alert("Login failed");
-    }
+  alert(
+    error.response?.data?.message ||
+    "Login failed"
+  );
+}
   };
 
  return (

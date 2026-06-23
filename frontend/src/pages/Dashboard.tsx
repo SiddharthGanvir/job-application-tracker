@@ -88,6 +88,16 @@ function Dashboard() {
 
   const createApplication =
     async () => {
+      if (
+  !companyName.trim() ||
+  !role.trim()
+) {
+  alert(
+    "Company Name and Role are required"
+  );
+
+  return;
+}
       try {
         await api.post(
           "/applications",
