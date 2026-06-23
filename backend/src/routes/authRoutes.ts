@@ -3,6 +3,7 @@ import {
   register,
   login,
   profile,
+  verifyEmail
 } from "../controllers/authController";
 
 import {
@@ -13,6 +14,10 @@ const router = express.Router();
 
 router.post("/register", register);
 router.post("/login", login);
+router.get(
+  "/verify/:token",
+  verifyEmail
+);
 router.get(
   "/profile",
   authenticateToken,
