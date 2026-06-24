@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 
 import api from "../services/api";
@@ -30,9 +31,7 @@ function Register() {
   !email.trim() ||
   !password.trim()
 ) {
-  alert(
-    "All fields are required"
-  );
+  toast.error("All fields are required")
 
   return;
 }
@@ -43,9 +42,7 @@ const emailRegex =
 if (
   !emailRegex.test(email)
 ) {
-  alert(
-    "Please enter a valid email address"
-  );
+  toast.error("Please enter a valid email ID")
 
   return;
 }
@@ -53,10 +50,7 @@ if (
 if (
   password.length < 8
 ) {
-  alert(
-    "Password must be at least 8 characters"
-  );
-
+  toast.error("Password must be of 8 characters or more")
   return;
 }
         await api.post(
@@ -68,17 +62,12 @@ if (
           }
         );
 
-        alert(
-          "Verification email sent successfully. Please verify your email before logging in."
-        );
+       toast.success("Verification mail sent successfully.Please check your Inbox")
 
         navigate("/");
       } catch (error) {
         console.error(error);
-
-        alert(
-          "Registration failed"
-        );
+        toast.error("Registration Failed")
       }
     };
 

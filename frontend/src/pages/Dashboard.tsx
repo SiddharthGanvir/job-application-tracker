@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-
+import toast from "react-hot-toast";
 import api from "../services/api";
 
 interface Application {
@@ -118,9 +118,10 @@ function Dashboard() {
   !platform.trim() ||
   !jobLink.trim()
 ) {
-  alert(
-    "Company Name and Role are required"
-  );
+
+ toast.error(
+  "All fields are required"
+);
 
   return;
 }
@@ -136,7 +137,9 @@ function Dashboard() {
             applicationDate,
           }
         );
-
+      toast.success(
+          "Application created successfully"
+          );
         setCompanyName("");
         setRole("");
         setStatus("Applied");
