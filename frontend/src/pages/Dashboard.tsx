@@ -2,9 +2,19 @@ import { useEffect, useState } from "react";
 
 import api from "../services/api";
 
+interface Application {
+  id: number;
+  companyName: string;
+  role: string;
+  status: string;
+  applicationDate: string;
+  platform: string;
+  jobLink: string;
+}
+
 function Dashboard() {
   const [applications, setApplications] =
-    useState<any[]>([]);
+    useState<Application[]>([]);
 
   const [companyName, setCompanyName] =
     useState("");
@@ -14,6 +24,20 @@ function Dashboard() {
 
   const [status, setStatus] =
     useState("Applied");
+
+  const [platform, setPlatform] =
+  useState("");
+
+  const [jobLink, setJobLink] =
+  useState("");
+
+  const [applicationDate,
+  setApplicationDate] =
+  useState(
+    new Date()
+      .toISOString()
+      .split("T")[0]
+  );
 
   const [searchTerm, setSearchTerm] =
     useState("");
@@ -90,7 +114,9 @@ function Dashboard() {
     async () => {
       if (
   !companyName.trim() ||
-  !role.trim()
+  !role.trim() ||
+  !platform.trim() ||
+  !jobLink.trim()
 ) {
   alert(
     "Company Name and Role are required"
@@ -105,12 +131,17 @@ function Dashboard() {
             companyName,
             role,
             status,
+            platform,
+            jobLink,
+            applicationDate,
           }
         );
 
         setCompanyName("");
         setRole("");
         setStatus("Applied");
+        setPlatform("")
+        setJobLink("")
 
         fetchApplications();
       } catch (error) {
@@ -264,6 +295,37 @@ function Dashboard() {
     }
   />
 
+  <input
+  type="text"
+  placeholder="Platform"
+  className="border rounded-lg px-4 py-2 w-64"
+  value={platform}
+  onChange={(e) =>
+    setPlatform(e.target.value)
+  }
+/>
+
+<input
+  type="text"
+  placeholder="Job Link"
+  className="border rounded-lg px-4 py-2 w-64"
+  value={jobLink}
+  onChange={(e) =>
+    setJobLink(e.target.value)
+  }
+/>
+
+  <input
+  type="date"
+  value={applicationDate}
+  onChange={(e) =>
+    setApplicationDate(
+      e.target.value
+    )
+  }
+  className="border rounded-lg px-4 py-2 w-64"
+/>
+
   <select
     className="border rounded-lg px-4 py-2"
     value={status}
@@ -337,6 +399,34 @@ function Dashboard() {
                 application.role
               }
             </p>
+
+            <p className="text-gray-500 mb-2">
+                Applied:{" "}
+                {new Date(
+                      application.applicationDate
+                    ).toLocaleDateString(
+                "en-GB",
+                {
+                 day: "numeric",
+                month: "short",
+                year: "numeric",
+               }
+  )}
+</p>
+
+             <p className="text-gray-600">
+              Platform: {application.platform}
+            </p>
+
+              <a
+                href={application.jobLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 underline"
+              >
+                View Job Posting
+            </a> 
+          
           <div className="flex items-center justify-between mt-4">
   <div>
     <label className="mr-2">

@@ -32,6 +32,9 @@ model JobApplication {
   status          String
   applicationDate DateTime @default(now())
 
+  platform        String?
+  jobLink         String?
+
   userId Int
   user   User @relation(fields: [userId], references: [id])
 }

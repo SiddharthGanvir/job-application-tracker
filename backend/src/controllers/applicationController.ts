@@ -12,7 +12,23 @@ export const createApplication = async (
       companyName,
       role,
       status,
+      platform,
+      jobLink,
+      applicationDate,
     } = req.body;
+
+  if (
+  !companyName?.trim() ||
+  !role?.trim() ||
+  !status?.trim() ||
+  !platform?.trim() ||
+  !jobLink?.trim()
+) {
+  return res.status(400).json({
+    message:
+      "All fields are required",
+  });
+}
 
     const application =
       await prisma.jobApplication.create({
@@ -20,6 +36,10 @@ export const createApplication = async (
           companyName,
           role,
           status,
+          platform,
+          jobLink,
+          applicationDate:
+            new Date(applicationDate),
           userId: req.userId!,
         },
       });
