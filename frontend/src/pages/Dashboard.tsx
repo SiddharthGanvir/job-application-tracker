@@ -94,6 +94,27 @@ function Dashboard() {
     }
   );
 
+  const getStatusBadgeColor = (
+  status: string
+) => {
+  switch (status) {
+    case "Applied":
+      return "bg-blue-100 text-blue-800";
+
+    case "Interview":
+      return "bg-yellow-100 text-yellow-800";
+
+    case "Offer":
+      return "bg-green-100 text-green-800";
+
+    case "Rejected":
+      return "bg-red-100 text-red-800";
+
+    default:
+      return "bg-gray-100 text-gray-800";
+  }
+};
+
   const fetchApplications =
     async () => {
       try {
@@ -403,6 +424,14 @@ function Dashboard() {
               }
             </p>
 
+            <span
+              className={`inline-block px-3 py-1 rounded-full text-sm font-medium mb-3 ${getStatusBadgeColor(
+              application.status
+                       )}`}
+            >
+  {application.status}
+</span>
+
             <p className="text-gray-500 mb-2">
                 Applied:{" "}
                 {new Date(
@@ -432,8 +461,8 @@ function Dashboard() {
           
           <div className="flex items-center justify-between mt-4">
   <div>
-    <label className="mr-2">
-      Status:
+    <label className="mr-2 font-medium">
+      Update Status:
     </label>
 
     <select
