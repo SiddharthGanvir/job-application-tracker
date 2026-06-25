@@ -1,6 +1,17 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import api from "../services/api";
+import {
+  FaCalendarAlt,
+  FaGlobe,
+  FaExternalLinkAlt,
+  FaTrash,
+  FaBriefcase,
+  FaPaperPlane,
+  FaUserTie,
+  FaCheckCircle,
+  FaTimesCircle,
+} from "react-icons/fa";
 
 interface Application {
   id: number;
@@ -72,6 +83,34 @@ function Dashboard() {
         app.status === "Rejected"
     ).length;
 
+    const StatCard = ({
+  title,
+  value,
+  icon,
+  iconColor,
+}: {
+  title: string;
+  value: number;
+  icon: React.ReactNode;
+  iconColor: string;
+}) => (
+  <div className="bg-white rounded-xl shadow-md hover:translate-y-1 transition p-6 border t-4 border-blue-500">
+    <div className="flex items-center justify-between">
+      <h3 className="text-sm font-medium text-gray-500">
+        {title}
+      </h3>
+
+      <div className={`text-xl ${iconColor}`}>
+        {icon}
+      </div>
+    </div>
+
+    <p className="text-5xl font-extrabold tracking-tight text-gray-800">
+      {value}
+    </p>
+  </div>
+);
+
   const filteredApplications =
   applications.filter(
     (application) => {
@@ -114,6 +153,7 @@ function Dashboard() {
       return "bg-gray-100 text-gray-800";
   }
 };
+
 
   const fetchApplications =
     async () => {
@@ -242,102 +282,115 @@ function Dashboard() {
         </button>
       </div>
 
-      <div
-        style={{
-          display: "flex",
-          gap: "15px",
-          flexWrap: "wrap",
-          marginTop: "20px",
-          marginBottom: "30px",
-        }}
-      >
-        <div className ="bg-white shadow-md rounded-lg p-6 min-w-[150px] text-center">
-        
-          <h3>Total</h3>
-          <h2>
-            {totalApplications}
-          </h2>
-        </div>
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-8">
+  <StatCard
+    title="Total Applications"
+    value={totalApplications}
+    icon={<FaBriefcase />}
+    iconColor="text-blue-500"
+  />
 
-        <div className ="bg-white shadow-md rounded-lg p-6 min-w-[150px] text-center">
-          
-          <h3>Applied</h3>
-          <h2>
-            {appliedCount}
-          </h2>
-        </div>
+  <StatCard
+    title="Applied"
+    value={appliedCount}
+    icon={<FaPaperPlane />}
+    iconColor="text-indigo-500"
+  />
 
-        <div className ="bg-white shadow-md rounded-lg p-6 min-w-[150px] text-center">
+  <StatCard
+    title="Interview"
+    value={interviewCount}
+    icon={<FaUserTie />}
+    iconColor="text-yellow-500"
+  />
 
-          <h3>Interview</h3>
-          <h2>
-            {interviewCount}
-          </h2>
-        </div>
+  <StatCard
+    title="Offers"
+    value={offerCount}
+    icon={<FaCheckCircle />}
+    iconColor="text-green-500"
+  />
 
-        <div className ="bg-white shadow-md rounded-lg p-6 min-w-[150px] text-center">
-
-          <h3>Offer</h3>
-          <h2>
-            {offerCount}
-          </h2>
-        </div>
-
-         <div className ="bg-white shadow-md rounded-lg p-6 min-w-[150px] text-center">
-
-          <h3>Rejected</h3>
-          <h2>
-            {rejectedCount}
-          </h2>
-        </div>
-      </div>
-
-      <div className = "bg-white p-6 rounded-lg shadow-md mb-8">
-        
-        <h2 className="text-2xl font-bold mb-4">
-          Create Application
+  <StatCard
+    title="Rejected"
+    value={rejectedCount}
+    icon={<FaTimesCircle />}
+    iconColor="text-red-500"
+  />
+</div>
+      <div className="bg-white rounded-xl shadow-md p-10 mb-10">
+        <h2 className="text-3xl font-bold mb-8">
+          Create New Application
         </h2>
 
-        <div className="flex flex-wrap gap-4 items-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      Company Name
+      </label>    
   <input
     type="text"
-    placeholder="Company Name"
+    placeholder="Enter Company Name"
     className="border rounded-lg px-4 py-2 w-64"
     value={companyName}
     onChange={(e) =>
       setCompanyName(e.target.value)
     }
   />
+  </div>
 
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      Role
+      </label>  
   <input
     type="text"
-    placeholder="Role"
+    placeholder="Enter Role"
     className="border rounded-lg px-4 py-2 w-64"
     value={role}
     onChange={(e) =>
       setRole(e.target.value)
     }
   />
+</div>
 
+<div>
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      Platform
+      </label>  
   <input
   type="text"
-  placeholder="Platform"
+  placeholder="Enter Job Portal Name"
   className="border rounded-lg px-4 py-2 w-64"
   value={platform}
   onChange={(e) =>
     setPlatform(e.target.value)
   }
 />
+</div>
+
+<div>
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      Job Link
+      </label>  
 
 <input
   type="text"
-  placeholder="Job Link"
+  placeholder="Paste the link for the role"
   className="border rounded-lg px-4 py-2 w-64"
   value={jobLink}
   onChange={(e) =>
     setJobLink(e.target.value)
   }
 />
+</div>
+
+<div>
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      Appplication Date
+      </label>  
 
   <input
   type="date"
@@ -349,9 +402,16 @@ function Dashboard() {
   }
   className="border rounded-lg px-4 py-2 w-64"
 />
+</div>
+
+
+<div>
+  <label className="block text-sm font-medium text-gray-700 mb-2">
+    Status
+  </label>
 
   <select
-    className="border rounded-lg px-4 py-2"
+    className="border rounded-lg px-4 py-2 w-50"
     value={status}
     onChange={(e) =>
       setStatus(e.target.value)
@@ -362,13 +422,16 @@ function Dashboard() {
     <option>Offer</option>
     <option>Rejected</option>
   </select>
+</div>
 
+<div className="md:col-span-2 flex justify-center mt-6">
   <button
-    className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold w-64 py-3 rounded-lg transition-all duration-200 hover:scale-105"
     onClick={createApplication}
   >
     Create Application
   </button>
+</div>
 </div>
       </div>
 
@@ -402,64 +465,73 @@ function Dashboard() {
   <option>Rejected</option>
 </select>
 </div>
-
-
-
-      {filteredApplications.map(
-        (application) => (
+<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {filteredApplications.map( (application) => (
 
           <div
             key={application.id}
-            className="bg-white shadow-md rounded-lg p-5 mb-4"
+            className="bg-white shadow-md hover:shadow-lg transition rounded-xl p-6"
           >
-            <h3 className="text-xl font-bold">
-              {
-                application.companyName
-              }
-            </h3>
+          <div className="flex justify-between items-center mb-3">
+  <div>
+    <h3 className="text-xl font-bold">
+      {application.companyName}
+    </h3>
 
-            <p className="text-gray-600 mb-4">
-              {
-                application.role
-              }
-            </p>
+    <p className="text-gray-600">
+      {application.role}
+    </p>
+  </div>
 
-            <span
-              className={`inline-block px-3 py-1 rounded-full text-sm font-medium mb-3 ${getStatusBadgeColor(
-              application.status
-                       )}`}
-            >
-  {application.status}
-</span>
+  <span
+    className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusBadgeColor(
+      application.status
+    )}`}
+  >
+    {application.status}
+  </span>
+</div>
 
-            <p className="text-gray-500 mb-2">
-                Applied:{" "}
-                {new Date(
-                      application.applicationDate
-                    ).toLocaleDateString(
-                "en-GB",
-                {
-                 day: "numeric",
-                month: "short",
-                year: "numeric",
-               }
-  )}
-</p>
 
-             <p className="text-gray-600">
-              Platform: {application.platform}
-            </p>
 
-              <a
-                href={application.jobLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-500 underline"
-              >
-                View Job Posting
-            </a> 
+       
+
+         <div className="flex items-center gap-2 text-gray-500 mb-2">
+  <FaCalendarAlt />
+
+  <span>
+    {new Date(
+      application.applicationDate
+    ).toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    })}
+  </span>
+</div>
+
+            <div className="flex items-center gap-2 text-gray-600 mb-2">
+  <FaGlobe />
+
+  <span>
+    {application.platform}
+  </span>
+</div>
+
+          <a
+  href={application.jobLink}
+  target="_blank"
+  rel="noopener noreferrer"
+  className="flex items-center gap-2 text-blue-500 hover:text-blue-700 mb-4"
+>
+  <FaExternalLinkAlt />
+
+  <span>
+    View Job Posting
+  </span>
+</a>    
           
-          <div className="flex items-center justify-between mt-4">
+          <div className="flex items-center justify-between border-t pt-4 mt-4">
   <div>
     <label className="mr-2 font-medium">
       Update Status:
@@ -483,19 +555,22 @@ function Dashboard() {
   </div>
 
   <button
-    className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600"
-    onClick={() =>
-      deleteApplication(
-        application.id
-      )
-    }
-  >
-    Delete
-  </button>
+  className="flex items-center gap-2 bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600"
+  onClick={() =>
+    deleteApplication(
+      application.id
+    )
+  }
+>
+  <FaTrash />
+
+  <span>Delete</span>
+</button>
 </div>    
           </div>
         )
       )}
+    </div>
     </div>
   );
 }
