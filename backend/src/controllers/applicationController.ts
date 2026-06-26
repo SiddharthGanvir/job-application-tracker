@@ -92,7 +92,14 @@ export const updateApplication = async (
   try {
     const applicationId = Number(req.params.id);
 
-    const { status } = req.body;
+    const {
+      companyName,
+      role,
+      status,
+      platform,
+      jobLink,
+      applicationDate,
+    } = req.body;
 
     const application =
       await prisma.jobApplication.findUnique({
@@ -119,15 +126,20 @@ export const updateApplication = async (
           id: applicationId,
         },
         data: {
+          companyName,
+          role,
           status,
+          platform,
+          jobLink,
+          applicationDate: new Date(applicationDate),
         },
       });
 
     return res.status(200).json({
-      message:
-        "Application updated successfully",
+      message: "Application updated successfully",
       updatedApplication,
     });
+
   } catch (error) {
     console.error(error);
 

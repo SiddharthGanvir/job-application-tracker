@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import api from "../services/api";
+import axios from "axios"
 import {
   FaCalendarAlt,
   FaGlobe,
   FaExternalLinkAlt,
   FaTrash,
+  FaEdit,
   FaBriefcase,
   FaPaperPlane,
   FaUserTie,
@@ -49,6 +51,35 @@ function Dashboard() {
       .toISOString()
       .split("T")[0]
   );
+
+  // Edit Modal State
+const [isEditModalOpen, setIsEditModalOpen] =
+  useState(false);
+
+const [editingApplicationId, setEditingApplicationId] =
+  useState<number | null>(null);
+
+const [isUpdating, setIsUpdating] =
+  useState(false);
+
+// Edit Form Fields
+const [editCompanyName, setEditCompanyName] =
+  useState("");
+
+const [editRole, setEditRole] =
+  useState("");
+
+const [editPlatform, setEditPlatform] =
+  useState("");
+
+const [editJobLink, setEditJobLink] =
+  useState("");
+
+const [editApplicationDate, setEditApplicationDate] =
+  useState("");
+
+const [editStatus, setEditStatus] =
+  useState("Applied");
 
   const [searchTerm, setSearchTerm] =
     useState("");
@@ -226,6 +257,92 @@ function Dashboard() {
       }
     };
 
+  const openEditModal = (application: Application) => {
+  setEditingApplicationId(application.id);
+
+  setEditCompanyName(application.companyName);
+  setEditRole(application.role);
+  setEditPlatform(application.platform || "");
+  setEditJobLink(application.jobLink || "");
+
+  setEditApplicationDate(
+    application.applicationDate.split("T")[0]
+  );
+
+  setEditStatus(application.status);
+
+  setIsEditModalOpen(true);
+};
+
+const updateApplication = async () => {
+
+  if(!editCompanyName.trim()){
+    toast.error("Company Name is required")
+    return;
+  }
+
+  if (!editRole.trim()) {
+  toast.error("Role is required");
+  return;
+}
+
+  if (
+  editJobLink &&
+  !/^https?:\/\/.+/.test(editJobLink)
+) {
+  toast.error(
+    "Please enter a valid URL starting with http:// or https://"
+  );
+  return;
+}
+  setIsUpdating(true);
+  try {
+    const token = localStorage.getItem("token");
+
+    await axios.put(
+      `http://localhost:5000/api/applications/${editingApplicationId}`,
+      {
+        companyName: editCompanyName,
+        role: editRole,
+        platform: editPlatform,
+        jobLink: editJobLink,
+        applicationDate: editApplicationDate,
+        status: editStatus,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+   toast.success("Application updated successfully");
+
+setEditingApplicationId(null);
+
+setEditCompanyName("");
+setEditRole("");
+setEditPlatform("");
+setEditJobLink("");
+setEditApplicationDate("");
+setEditStatus("Applied");
+
+setIsEditModalOpen(false);
+
+fetchApplications();
+  } catch (error) {
+    console.error("Update Error:", error);
+
+if (axios.isAxiosError(error)) {
+  console.log(error.response?.data);
+}
+
+    toast.error("Failed to update application");
+  } finally {
+    setIsUpdating(false);
+  }
+};
+
   const updateApplicationStatus =
     async (
       id: number,
@@ -258,6 +375,20 @@ function Dashboard() {
 
     fetchApplications();
   }, []);
+
+  useEffect(() => {
+  const handleEscape = (event: KeyboardEvent) => {
+    if (event.key === "Escape") {
+      setIsEditModalOpen(false);
+    }
+  };
+
+  window.addEventListener("keydown", handleEscape);
+
+  return () => {
+    window.removeEventListener("keydown", handleEscape);
+  };
+}, []);
 
   return (
     
@@ -554,23 +685,181 @@ function Dashboard() {
     </select>
   </div>
 
-  <button
-  className="flex items-center gap-2 bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600"
-  onClick={() =>
-    deleteApplication(
-      application.id
-    )
-  }
->
-  <FaTrash />
+ <div className="flex gap-3">
 
-  <span>Delete</span>
-</button>
+  <button
+    className="flex items-center gap-2 bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600"
+    onClick={() =>
+      openEditModal(application)
+    }
+  >
+    <FaEdit />
+    <span>Edit</span>
+  </button>
+
+  <button
+    className="flex items-center gap-2 bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600"
+    onClick={() =>
+      deleteApplication(
+        application.id
+      )
+    }
+  >
+    <FaTrash />
+    <span>Delete</span>
+  </button>
+
+</div>
 </div>    
           </div>
         )
       )}
     </div>
+
+    {isEditModalOpen && (
+    <div
+  className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+  onClick={() => setIsEditModalOpen(false)}
+>  
+
+    <div
+  className="bg-white rounded-xl shadow-xl p-8 w-full max-w-2xl"
+  onClick={(e) => e.stopPropagation()}
+>
+
+      <h2 className="text-2xl font-bold mb-6">
+        Edit Application
+      </h2>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <div>
+          <label className="block text-sm font-medium mb-2">
+            Company Name
+          </label>
+
+          <input
+            type="text"
+            value={editCompanyName}
+            onChange={(e) =>
+              setEditCompanyName(e.target.value)
+            }
+            className="border rounded-lg px-4 py-2 w-full"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-2">
+            Role
+          </label>
+
+          <input
+            type="text"
+            value={editRole}
+            onChange={(e) =>
+              setEditRole(e.target.value)
+            }
+            className="border rounded-lg px-4 py-2 w-full"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-2">
+            Platform
+          </label>
+
+          <input
+            type="text"
+            value={editPlatform}
+            onChange={(e) =>
+              setEditPlatform(e.target.value)
+            }
+            className="border rounded-lg px-4 py-2 w-full"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-2">
+            Job Link
+          </label>
+
+          <input
+            type="text"
+            value={editJobLink}
+            onChange={(e) =>
+              setEditJobLink(e.target.value)
+            }
+            className="border rounded-lg px-4 py-2 w-full"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-2">
+            Application Date
+          </label>
+
+          <input
+            type="date"
+            value={editApplicationDate}
+            onChange={(e) =>
+              setEditApplicationDate(e.target.value)
+            }
+            className="border rounded-lg px-4 py-2 w-full"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-2">
+            Status
+          </label>
+
+          <select
+            value={editStatus}
+            onChange={(e) =>
+              setEditStatus(e.target.value)
+            }
+            className="border rounded-lg px-4 py-2 w-full"
+          >
+            <option>Applied</option>
+            <option>Interview</option>
+            <option>Offer</option>
+            <option>Rejected</option>
+          </select>
+        </div>
+
+      </div>
+
+      <div className="flex justify-end gap-4 mt-8">
+
+        <button
+          onClick={() =>
+            setIsEditModalOpen(false)
+          }
+          className="bg-gray-400 hover:bg-gray-500 text-white px-6 py-2 rounded-lg"
+        >
+          Cancel
+        </button>
+
+       <button
+  onClick={updateApplication}
+  disabled={isUpdating}
+  className={`px-6 py-2 rounded-lg text-white transition ${
+    isUpdating
+      ? "bg-blue-300 cursor-not-allowed"
+      : "bg-blue-600 hover:bg-blue-700"
+  }`}
+>
+  {isUpdating ? "Saving..." : "Save Changes"}
+</button>
+
+      </div>
+
+    </div>
+
+  </div>
+)}
+
+
     </div>
   );
 }
