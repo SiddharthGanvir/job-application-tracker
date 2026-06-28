@@ -57,6 +57,9 @@ function Dashboard() {
   const [platform, setPlatform] =
   useState("");
 
+  const [customPlatform, setCustomPlatform] = 
+  useState("");
+
   const [jobLink, setJobLink] =
   useState("");
 
@@ -87,6 +90,9 @@ const [editRole, setEditRole] =
 
 const [editPlatform, setEditPlatform] =
   useState("");
+
+const [editCustomPlatform, setEditCustomPlatform] = 
+useState("");
 
 const [editJobLink, setEditJobLink] =
   useState("");
@@ -280,6 +286,18 @@ const COLORS = [
   "#EF4444",
 ];
 
+const PLATFORM_OPTIONS = [
+  "LinkedIn",
+  "Indeed",
+  "Naukri",
+  "Glassdoor",
+  "Wellfound",
+  "Company Career Page",
+  "Referral",
+  "Campus Placement",
+  "Other",
+];
+
 
   const fetchApplications =
     async () => {
@@ -319,7 +337,10 @@ const COLORS = [
             companyName,
             role,
             status,
-            platform,
+            platform:
+            platform === "Other"
+            ? customPlatform
+            : platform,
             jobLink,
             applicationDate,
           }
@@ -332,6 +353,7 @@ const COLORS = [
         setStatus("Applied");
         setPlatform("")
         setJobLink("")
+        setCustomPlatform("");
 
         fetchApplications();
       } catch (error) {
@@ -357,7 +379,15 @@ const COLORS = [
 
   setEditCompanyName(application.companyName);
   setEditRole(application.role);
-  setEditPlatform(application.platform || "");
+  if (
+  PLATFORM_OPTIONS.includes(application.platform)
+) {
+  setEditPlatform(application.platform);
+  setEditCustomPlatform("");
+} else {
+  setEditPlatform("Other");
+  setEditCustomPlatform(application.platform);
+}
   setEditJobLink(application.jobLink || "");
 
   setEditApplicationDate(
@@ -399,7 +429,10 @@ const updateApplication = async () => {
       {
         companyName: editCompanyName,
         role: editRole,
-        platform: editPlatform,
+        platform:
+        editPlatform === "Other"
+        ? editCustomPlatform
+        : editPlatform,
         jobLink: editJobLink,
         applicationDate: editApplicationDate,
         status: editStatus,
@@ -418,6 +451,7 @@ setEditingApplicationId(null);
 setEditCompanyName("");
 setEditRole("");
 setEditPlatform("");
+setEditCustomPlatform("");
 setEditJobLink("");
 setEditApplicationDate("");
 setEditStatus("Applied");
@@ -638,11 +672,23 @@ if (axios.isAxiosError(error)) {
 
     <ResponsiveContainer width="100%" height="100%">
 
-      <BarChart data={platformChartData}>
+      <BarChart data={platformChartData}
+                margin={{
+                  top: 10,
+                  right: 20,
+                  left: 20,
+                  bottom: 40,
+                }}>
 
         <CartesianGrid strokeDasharray="3 3" />
 
-        <XAxis dataKey="platform" />
+        <XAxis
+          dataKey="platform"
+          angle={-25}
+          textAnchor="end"
+          interval={0}
+          height={90}
+        />
 
         <YAxis allowDecimals={false} />
 
@@ -756,15 +802,36 @@ if (axios.isAxiosError(error)) {
     <label className="block text-sm font-medium text-gray-700 mb-2">
       Platform
       </label>  
-  <input
-  type="text"
-  placeholder="Enter Job Portal Name"
-  className="border rounded-lg px-4 py-2 w-64"
+  <select
   value={platform}
-  onChange={(e) =>
-    setPlatform(e.target.value)
-  }
-/>
+  onChange={(e) => setPlatform(e.target.value)}
+  className="border rounded-lg px-4 py-2 w-64"
+>
+  <option value="">Select Platform</option>
+
+  {PLATFORM_OPTIONS.map((option) => (
+    <option key={option} value={option}>
+      {option}
+    </option>
+  ))}
+</select>
+{platform === "Other" && (
+  <div className="mt-4">
+    <label className="block mb-2 font-medium">
+      Custom Platform
+    </label>
+
+    <input
+      type="text"
+      placeholder="Enter platform name"
+      value={customPlatform}
+      onChange={(e) =>
+        setCustomPlatform(e.target.value)
+      }
+      className="border rounded-lg px-4 py-2 w-64"
+    />
+  </div>
+)}
 </div>
 
 <div>
@@ -862,7 +929,8 @@ if (axios.isAxiosError(error)) {
 </select>
 </div>
 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      {filteredApplications.map( (application) => (
+      {filteredApplications.length > 0 ? (
+        filteredApplications.map((application) => (
 
           <div
             key={application.id}
@@ -976,9 +1044,30 @@ if (axios.isAxiosError(error)) {
 
 </div>
 </div>    
-          </div>
+                </div>
         )
-      )}
+      )
+   ) : applications.length === 0 ? (
+  <div className="bg-white rounded-2xl shadow-md p-10 text-center">
+    <h2 className="text-2xl font-semibold mb-2">
+      No applications yet
+    </h2>
+
+    <p className="text-gray-500">
+      Start tracking your job search by creating your first application.
+    </p>
+  </div>
+) : (
+  <div className="bg-white rounded-2xl shadow-md p-10 text-center">
+    <h2 className="text-2xl font-semibold mb-2">
+      No matching applications found
+    </h2>
+
+    <p className="text-gray-500">
+      Try another company name or clear your search.
+    </p>
+  </div>
+)}
     </div>
 
     {isEditModalOpen && (
@@ -1033,14 +1122,35 @@ if (axios.isAxiosError(error)) {
             Platform
           </label>
 
-          <input
-            type="text"
-            value={editPlatform}
-            onChange={(e) =>
-              setEditPlatform(e.target.value)
-            }
-            className="border rounded-lg px-4 py-2 w-full"
-          />
+          <select
+  value={editPlatform}
+  onChange={(e) => setEditPlatform(e.target.value)}
+  className="border rounded-lg px-4 py-2 w-full"
+>
+  <option value="">Select Platform</option>
+
+  {PLATFORM_OPTIONS.map((option) => (
+    <option key={option} value={option}>
+      {option}
+    </option>
+  ))}
+</select>
+
+{editPlatform === "Other" && (
+  <div className="mt-4">
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      Custom Platform
+    </label>
+
+    <input
+      type="text"
+      placeholder="Enter platform name"
+      value={editCustomPlatform}
+      onChange={(e) => setEditCustomPlatform(e.target.value)}
+      className="border rounded-lg px-4 py-2 w-full"
+    />
+  </div>
+)}
         </div>
 
         <div>
