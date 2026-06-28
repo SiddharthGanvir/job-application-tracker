@@ -15,6 +15,22 @@ import {
   FaTimesCircle,
 } from "react-icons/fa";
 
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Tooltip,
+  Legend,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  LineChart,
+  Line,
+} from "recharts";
+
 interface Application {
   id: number;
   companyName: string;
@@ -184,6 +200,85 @@ const [editStatus, setEditStatus] =
       return "bg-gray-100 text-gray-800";
   }
 };
+
+const statusChartData = [
+  {
+    name: "Applied",
+    value: applications.filter(
+      (app) => app.status === "Applied"
+    ).length,
+  },
+  {
+    name: "Interview",
+    value: applications.filter(
+      (app) => app.status === "Interview"
+    ).length,
+  },
+  {
+    name: "Offer",
+    value: applications.filter(
+      (app) => app.status === "Offer"
+    ).length,
+  },
+  {
+    name: "Rejected",
+    value: applications.filter(
+      (app) => app.status === "Rejected"
+    ).length,
+  },
+];
+
+const totalStatusApplications = statusChartData.reduce(
+  (sum, item) => sum + item.value,
+  0
+);
+
+const platformChartData = Array.from(
+  new Set(applications.map((app) => app.platform))
+).map((platform) => ({
+  platform,
+  count: applications.filter(
+    (app) => app.platform === platform
+  ).length,
+}));
+
+const monthlyChartData = [...applications]
+  .sort(
+    (a, b) =>
+      new Date(a.applicationDate).getTime() -
+      new Date(b.applicationDate).getTime()
+  )
+  .reduce((acc, app) => {
+    const month = new Date(app.applicationDate).toLocaleString(
+      "default",
+      {
+        month: "short",
+        year: "numeric"
+      }
+    );
+
+    const existingMonth = acc.find(
+      (item) => item.month === month
+    );
+
+    if (existingMonth) {
+      existingMonth.count++;
+    } else {
+      acc.push({
+        month,
+        count: 1,
+      });
+    }
+
+    return acc;
+  }, [] as { month: string; count: number }[]);
+
+const COLORS = [
+  "#3B82F6",
+  "#FACC15",
+  "#22C55E",
+  "#EF4444",
+];
 
 
   const fetchApplications =
@@ -449,6 +544,176 @@ if (axios.isAxiosError(error)) {
     iconColor="text-red-500"
   />
 </div>
+{/* Analytics Section */}
+
+<div className="bg-white rounded-xl shadow-md p-10 mb-10">
+
+  <h2 className="text-3xl font-bold mb-10">
+    Analytics
+  </h2>
+
+<div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    
+
+    {/* Status Pie Chart */}
+
+        <div className="bg-gray-50 rounded-xl  shadow-md p-8">
+
+      <h3 className="text-xl font-semibold mb-2">
+  Applications by Status
+</h3>
+
+<p className="text-gray-500 text-sm mb-8">
+  Distribution of all your job applications
+</p>
+
+      <div className="h-80">
+
+        <ResponsiveContainer width="100%" height="100%">
+
+          <PieChart>
+
+            <Pie
+              data={statusChartData}
+              dataKey="value"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              outerRadius={120}
+              label={({ value }) =>
+  totalStatusApplications > 0
+    ? `${Math.round((value / totalStatusApplications) * 100)}%`
+    : "0%"
+}
+            >
+              {statusChartData.map((_, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={COLORS[index % COLORS.length]}
+                />
+              ))}
+            </Pie>
+
+            <Tooltip
+  formatter={(value) => {
+  const numericValue = Number(value);
+
+  const percentage =
+    totalStatusApplications > 0
+      ? Math.round(
+          (numericValue / totalStatusApplications) * 100
+        )
+      : 0;
+
+  return [
+    `${numericValue} (${percentage}%)`,
+    "Applications",
+  ];
+}}
+/>
+
+            <Legend />
+
+          </PieChart>
+
+        </ResponsiveContainer>
+
+      </div>
+      
+
+    </div>
+    {/* Platform Chart */}
+
+<div className="bg-gray-50 rounded-xl shadow-md p-8">
+
+  <h3 className="text-xl font-semibold mb-2">
+    Applications by Platform
+  </h3>
+
+  <p className="text-gray-500 text-sm mb-8">
+    Number of applications submitted through each platform
+  </p>
+
+  <div className="h-80">
+
+    <ResponsiveContainer width="100%" height="100%">
+
+      <BarChart data={platformChartData}>
+
+        <CartesianGrid strokeDasharray="3 3" />
+
+        <XAxis dataKey="platform" />
+
+        <YAxis allowDecimals={false} />
+
+        <Tooltip />
+
+        <Bar
+          dataKey="count"
+          fill="#3B82F6"
+          radius={[8, 8, 0, 0]}
+        />
+
+      </BarChart>
+
+    </ResponsiveContainer>
+
+  </div>
+
+
+</div>
+
+
+  </div>
+  
+
+</div>
+{/* Monthly Trend */}
+
+<div className="bg-gray-50 rounded-xl shadow-md p-8 mt-8 mb-10">
+
+  <h3 className="text-xl font-semibold mb-2">
+    Monthly Application Trend
+  </h3>
+
+  <p className="text-gray-500 text-sm mb-8">
+    Track how consistently you have applied for jobs over time
+  </p>
+
+  <div className="h-96">
+
+    <ResponsiveContainer width="100%" height="100%">
+
+      <LineChart data={monthlyChartData}>
+
+        <CartesianGrid strokeDasharray="3 3" />
+
+        <XAxis dataKey="month" />
+
+        <YAxis allowDecimals={false} />
+
+        <Tooltip />
+
+        <Line
+          type="natural"
+          dataKey="count"
+          stroke="#2563EB"
+          strokeWidth={3}
+          dot={{ r: 6 }}
+          activeDot={{ r: 8 }}
+        />
+
+      </LineChart>
+
+    </ResponsiveContainer>
+
+  </div>
+
+</div>
+
+
+
+
       <div className="bg-white rounded-xl shadow-md p-10 mb-10">
         <h2 className="text-3xl font-bold mb-8">
           Create New Application

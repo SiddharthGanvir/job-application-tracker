@@ -17,6 +17,7 @@ export const createApplication = async (
       applicationDate,
     } = req.body;
 
+
   if (
   !companyName?.trim() ||
   !role?.trim() ||
@@ -100,6 +101,8 @@ export const updateApplication = async (
       jobLink,
       applicationDate,
     } = req.body;
+
+    
 
     const application =
       await prisma.jobApplication.findUnique({
