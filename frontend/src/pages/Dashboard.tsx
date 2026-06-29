@@ -1,3 +1,4 @@
+//Imports//
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import api from "../services/api";
@@ -31,6 +32,62 @@ import {
   Line,
 } from "recharts";
 
+// End of Imports //
+
+// Constants //
+const PLATFORM_OPTIONS = [
+  "LinkedIn",
+  "Indeed",
+  "Naukri",
+  "Glassdoor",
+  "Wellfound",
+  "Company Career Page",
+  "Referral",
+  "Campus Placement",
+  "Other",
+];
+
+const COLORS = [
+  "#3B82F6",
+  "#FACC15",
+  "#22C55E",
+  "#EF4444",
+];
+
+// End of Constants//
+
+// Helper Components//
+
+ const StatCard = ({
+  title,
+  value,
+  icon,
+  iconColor,
+}: {
+  title: string;
+  value: number;
+  icon: React.ReactNode;
+  iconColor: string;
+}) => (
+  <div className="bg-white rounded-xl shadow-md hover:translate-y-1 transition p-6 border t-4 border-blue-500">
+    <div className="flex items-center justify-between">
+      <h3 className="text-sm font-medium text-gray-500">
+        {title}
+      </h3>
+
+      <div className={`text-xl ${iconColor}`}>
+        {icon}
+      </div>
+    </div>
+
+    <p className="text-5xl font-extrabold tracking-tight text-gray-800">
+      {value}
+    </p>
+  </div>
+);
+
+// End of Helper Components//
+
 interface Application {
   id: number;
   companyName: string;
@@ -41,10 +98,18 @@ interface Application {
   jobLink: string;
 }
 
+// Dashboard Component //
 function Dashboard() {
+
+  // State Variables //
+
+ // Application Data //
   const [applications, setApplications] =
     useState<Application[]>([]);
+  const [loading, setLoading] = 
+    useState(true);
 
+  //Create Application Form //
   const [companyName, setCompanyName] =
     useState("");
 
@@ -71,17 +136,21 @@ function Dashboard() {
       .split("T")[0]
   );
 
-  // Edit Modal State
+  // Edit Modal //
 const [isEditModalOpen, setIsEditModalOpen] =
   useState(false);
 
 const [editingApplicationId, setEditingApplicationId] =
   useState<number | null>(null);
 
+//Delete Modal
+const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+const [applicationToDelete, setApplicationToDelete] = useState<number | null>(null);
+
 const [isUpdating, setIsUpdating] =
   useState(false);
 
-// Edit Form Fields
+// Edit Form 
 const [editCompanyName, setEditCompanyName] =
   useState("");
 
@@ -109,6 +178,43 @@ const [editStatus, setEditStatus] =
   const [filterStatus, setFilterStatus] =
   useState("All");
 
+  // End of State Variables
+
+  //useEffect Hooks //
+   
+  useEffect(() => {
+  const handleEscape = (event: KeyboardEvent) => {
+    if (event.key === "Escape") {
+      setIsEditModalOpen(false);
+    }
+  };
+
+  window.addEventListener("keydown", handleEscape);
+
+  return () => {
+    window.removeEventListener("keydown", handleEscape);
+  };
+}, []);
+
+  useEffect(() => {
+    const token =
+      localStorage.getItem(
+        "token"
+      );
+
+    if (!token) {
+      window.location.href = "/";
+      return;
+    }
+
+    fetchApplications();
+  }, []);
+
+  //End Of useEffect Hooks //
+
+  //Analytics Calculations //
+
+  //Statistics //
   const totalApplications =
     applications.length;
 
@@ -135,34 +241,6 @@ const [editStatus, setEditStatus] =
       (app) =>
         app.status === "Rejected"
     ).length;
-
-    const StatCard = ({
-  title,
-  value,
-  icon,
-  iconColor,
-}: {
-  title: string;
-  value: number;
-  icon: React.ReactNode;
-  iconColor: string;
-}) => (
-  <div className="bg-white rounded-xl shadow-md hover:translate-y-1 transition p-6 border t-4 border-blue-500">
-    <div className="flex items-center justify-between">
-      <h3 className="text-sm font-medium text-gray-500">
-        {title}
-      </h3>
-
-      <div className={`text-xl ${iconColor}`}>
-        {icon}
-      </div>
-    </div>
-
-    <p className="text-5xl font-extrabold tracking-tight text-gray-800">
-      {value}
-    </p>
-  </div>
-);
 
   const filteredApplications =
   applications.filter(
@@ -207,6 +285,7 @@ const [editStatus, setEditStatus] =
   }
 };
 
+// Status Distribution Chart//
 const statusChartData = [
   {
     name: "Applied",
@@ -239,6 +318,7 @@ const totalStatusApplications = statusChartData.reduce(
   0
 );
 
+// Platform Distribution Chart //
 const platformChartData = Array.from(
   new Set(applications.map((app) => app.platform))
 ).map((platform) => ({
@@ -248,6 +328,7 @@ const platformChartData = Array.from(
   ).length,
 }));
 
+// Monthly Trend Chart //
 const monthlyChartData = [...applications]
   .sort(
     (a, b) =>
@@ -262,6 +343,7 @@ const monthlyChartData = [...applications]
         year: "numeric"
       }
     );
+
 
     const existingMonth = acc.find(
       (item) => item.month === month
@@ -279,28 +361,9 @@ const monthlyChartData = [...applications]
     return acc;
   }, [] as { month: string; count: number }[]);
 
-const COLORS = [
-  "#3B82F6",
-  "#FACC15",
-  "#22C55E",
-  "#EF4444",
-];
-
-const PLATFORM_OPTIONS = [
-  "LinkedIn",
-  "Indeed",
-  "Naukri",
-  "Glassdoor",
-  "Wellfound",
-  "Company Career Page",
-  "Referral",
-  "Campus Placement",
-  "Other",
-];
-
-
   const fetchApplications =
     async () => {
+      setLoading(true);
       try {
         const response =
           await api.get(
@@ -312,8 +375,11 @@ const PLATFORM_OPTIONS = [
         );
       } catch (error) {
         console.error(error);
+      } finally{
+        setLoading(false);
       }
-    };
+    }
+    ;
 
   const createApplication =
     async () => {
@@ -472,54 +538,24 @@ if (axios.isAxiosError(error)) {
   }
 };
 
-  const updateApplicationStatus =
-    async (
-      id: number,
-      status: string
-    ) => {
-      try {
-        await api.put(
-          `/applications/${id}`,
-          {
-            status,
-          }
-        );
-
-        fetchApplications();
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-  useEffect(() => {
-    const token =
-      localStorage.getItem(
-        "token"
-      );
-
-    if (!token) {
-      window.location.href = "/";
-      return;
-    }
-
-    fetchApplications();
-  }, []);
-
-  useEffect(() => {
-  const handleEscape = (event: KeyboardEvent) => {
-    if (event.key === "Escape") {
-      setIsEditModalOpen(false);
-    }
-  };
-
-  window.addEventListener("keydown", handleEscape);
-
-  return () => {
-    window.removeEventListener("keydown", handleEscape);
-  };
-}, []);
-
+if (loading) {
   return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
+      <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600"></div>
+
+      <h2 className="mt-6 text-2xl font-semibold text-gray-800">
+        Loading Dashboard...
+      </h2>
+
+      <p className="mt-2 text-gray-500">
+        Please wait while we fetch your applications.
+      </p>
+    </div>
+  );
+}
+
+return (
+
     
     <div className="min-h-screen bg-gray-100 p-10">
     <div className="flex justify-between items-center mb-8">
@@ -613,7 +649,7 @@ if (axios.isAxiosError(error)) {
               nameKey="name"
               cx="50%"
               cy="50%"
-              outerRadius={120}
+              outerRadius={75}
               label={({ value }) =>
   totalStatusApplications > 0
     ? `${Math.round((value / totalStatusApplications) * 100)}%`
@@ -646,7 +682,14 @@ if (axios.isAxiosError(error)) {
 }}
 />
 
-            <Legend />
+         <Legend
+  verticalAlign="bottom"
+  height={36}
+  wrapperStyle={{
+    paddingTop: "10px",
+    fontSize: "14px",
+  }}
+/>   
 
           </PieChart>
 
@@ -995,30 +1038,17 @@ if (axios.isAxiosError(error)) {
   </span>
 </a>    
           
-          <div className="flex items-center justify-between border-t pt-4 mt-4">
-  <div>
-    <label className="mr-2 font-medium">
-      Update Status:
-    </label>
+  <div className="flex items-center">
+  <span className="font-medium text-gray-700">
+    Status:
+  </span>
 
-    <select
-      className="border rounded-lg px-3 py-1"
-      value={application.status}
-      onChange={(e) =>
-        updateApplicationStatus(
-          application.id,
-          e.target.value
-        )
-      }
-    >
-      <option>Applied</option>
-      <option>Interview</option>
-      <option>Offer</option>
-      <option>Rejected</option>
-    </select>
-  </div>
+  <span className="ml-2 text-gray-600">
+    {application.status}
+  </span>
+</div>
 
- <div className="flex gap-3">
+ <div className="flex gap-3 justify-end">
 
   <button
     className="flex items-center gap-2 bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600"
@@ -1032,11 +1062,10 @@ if (axios.isAxiosError(error)) {
 
   <button
     className="flex items-center gap-2 bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600"
-    onClick={() =>
-      deleteApplication(
-        application.id
-      )
-    }
+    onClick={() => {
+  setApplicationToDelete(application.id);
+  setIsDeleteModalOpen(true);
+}}
   >
     <FaTrash />
     <span>Delete</span>
@@ -1044,7 +1073,6 @@ if (axios.isAxiosError(error)) {
 
 </div>
 </div>    
-                </div>
         )
       )
    ) : applications.length === 0 ? (
@@ -1151,6 +1179,8 @@ if (axios.isAxiosError(error)) {
     />
   </div>
 )}
+
+
         </div>
 
         <div>
@@ -1231,6 +1261,54 @@ if (axios.isAxiosError(error)) {
 
     </div>
 
+  </div>
+)}
+{/* Delete Confirmation Modal */}
+{isDeleteModalOpen && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="bg-white rounded-2xl p-8 w-full max-w-md shadow-xl">
+
+      <h2 className="text-2xl font-bold mb-4">
+        Delete Application
+      </h2>
+
+      <p className="text-gray-600 mb-6">
+        Are you sure you want to delete this application?
+      </p>
+
+      <p className="text-red-600 text-sm mb-8">
+        This action cannot be undone.
+      </p>
+
+      <div className="flex justify-end gap-4">
+
+        <button
+          onClick={() => {
+            setIsDeleteModalOpen(false);
+            setApplicationToDelete(null);
+          }}
+          className="px-5 py-2 rounded-lg border border-gray-300 hover:bg-gray-100"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={() => {
+            if (applicationToDelete !== null) {
+              deleteApplication(applicationToDelete);
+            }
+
+            setIsDeleteModalOpen(false);
+            setApplicationToDelete(null);
+          }}
+          className="px-5 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700"
+        >
+          Delete
+        </button>
+
+      </div>
+
+    </div>
   </div>
 )}
 
