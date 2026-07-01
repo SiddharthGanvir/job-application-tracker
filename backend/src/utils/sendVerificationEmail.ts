@@ -1,47 +1,63 @@
-import nodemailer from "nodemailer";
+import axios from "axios";
 
-export const sendVerificationEmail =
-  async (
-    email: string,
-    token: string
-  ) => {
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: 465,
-  secure: true,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-  connectionTimeout: 10000,
-  greetingTimeout: 10000,
-  socketTimeout: 10000,
-});
-    const verificationLink =
-  `${process.env.BACKEND_URL}/api/auth/verify/${token}`;
+export async function sendVerificationEmail(
+  email: string,
+  token: string
+) {
+  const verificationLink =
+    `${process.env.BACKEND_URL}/api/auth/verify/${token}`;
 
-   try {
-  await transporter.sendMail({
-   from: `"Career Flow" <${process.env.SMTP_USER}>`,
-    to: email,
-    subject: "Verify Your Email",
-    html: `
-      <h2>Welcome to Career Flow</h2>
+  try {
+    await axios.post(
+      "https://api.brevo.com/v3/smtp/email",
+      {
+        sender: {
+          name: "Career Flow",
+          email: "siddharthganvir01@gmail.com",
+        },
 
-      <p>
-        Click the button below to verify your email:
-      </p>
+        to: [
+          {
+            email: email,
+          },
+        ],
 
-      <a href="${verificationLink}">
-        Verify Email
-      </a>
-    `,
-  });
+        subject: "Verify Your Career Flow Account",
 
-  console.log("✅ Verification email sent successfully.");
+        htmlContent: `
+          <h2>Welcome to Career Flow</h2>
 
-} catch (error) {
-  console.error("❌ Error sending verification email:", error);
-  throw error;
-} 
-  };
+          <p>Click the button below to verify your email.</p>
+
+          <p>
+            <a href="${verificationLink}">
+              Verify Email
+            </a>
+          </p>
+        `,
+      },
+      {
+        headers: {
+          accept: "application/json",
+          "content-type": "application/json",
+          "api-key": process.env.BREVO_API_KEY!,
+        },
+        timeout: 10000,
+      }
+    );
+
+    console.log("✅ Verification email sent successfully.");
+  } catch (error: any) {
+    console.error(
+      "❌ Error sending verification email:"
+    );
+
+    if (error.response) {
+      console.error(error.response.data);
+    } else {
+      console.error(error.message);
+    }
+
+    throw error;
+  }
+}
