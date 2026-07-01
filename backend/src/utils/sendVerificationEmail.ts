@@ -18,26 +18,30 @@ export const sendVerificationEmail =
       });
 
     const verificationLink =
-      `http://localhost:5000/api/auth/verify/${token}`;
+  `${process.env.BACKEND_URL}/api/auth/verify/${token}`;
 
-    await transporter.sendMail({
-      from:
-        process.env.EMAIL_USER,
-      to: email,
-      subject:
-        "Verify Your Email",
-      html: `
-        <h2>Welcome to Job Application Tracker</h2>
+   try {
+  await transporter.sendMail({
+    from: process.env.EMAIL_USER,
+    to: email,
+    subject: "Verify Your Email",
+    html: `
+      <h2>Welcome to Career Flow</h2>
 
-        <p>
-          Click the button below to verify your email:
-        </p>
+      <p>
+        Click the button below to verify your email:
+      </p>
 
-        <a
-          href="${verificationLink}"
-        >
-          Verify Email
-        </a>
-      `,
-    });
+      <a href="${verificationLink}">
+        Verify Email
+      </a>
+    `,
+  });
+
+  console.log("✅ Verification email sent successfully.");
+
+} catch (error) {
+  console.error("❌ Error sending verification email:", error);
+  throw error;
+} 
   };
