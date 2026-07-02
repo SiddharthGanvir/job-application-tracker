@@ -490,8 +490,8 @@ const updateApplication = async () => {
   try {
     const token = localStorage.getItem("token");
 
-    await axios.put(
-      `http://localhost:5000/api/applications/${editingApplicationId}`,
+    await api.put(
+      `/applications/${editingApplicationId}`,
       {
         companyName: editCompanyName,
         role: editRole,
